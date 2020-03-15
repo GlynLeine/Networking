@@ -58,3 +58,8 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
+000_assignment_1_starting_code/client/Export
+000_assignment_1_starting_code/client/Library
+000_assignment_1_starting_code/client/obj
+000_assignment_1_starting_code/server/bin/Debug
+000_assignment_1_starting_code/server/obj/x86/Debug
