@@ -66,31 +66,31 @@
     <Compile Include="Assets\Scripts\shared\StreamUtil.cs" />
     <Compile Include="Assets\Scripts\TCPChatClient.cs" />
     <Reference Include="Unity.Timeline.Editor">
-      <HintPath>I:/Y2/Block 3/Networking/000_assignment_1_starting_code/client/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
+      <HintPath>I:/Networking/000_assignment_1_starting_code/client/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VSCode.Editor">
-      <HintPath>I:/Y2/Block 3/Networking/000_assignment_1_starting_code/client/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
+      <HintPath>I:/Networking/000_assignment_1_starting_code/client/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro.Editor">
-      <HintPath>I:/Y2/Block 3/Networking/000_assignment_1_starting_code/client/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
+      <HintPath>I:/Networking/000_assignment_1_starting_code/client/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>I:/Y2/Block 3/Networking/000_assignment_1_starting_code/client/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
+      <HintPath>I:/Networking/000_assignment_1_starting_code/client/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Timeline">
-      <HintPath>I:/Y2/Block 3/Networking/000_assignment_1_starting_code/client/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
+      <HintPath>I:/Networking/000_assignment_1_starting_code/client/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
     </Reference>
     <Reference Include="Unity.CollabProxy.Editor">
-      <HintPath>I:/Y2/Block 3/Networking/000_assignment_1_starting_code/client/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
+      <HintPath>I:/Networking/000_assignment_1_starting_code/client/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Rider.Editor">
-      <HintPath>I:/Y2/Block 3/Networking/000_assignment_1_starting_code/client/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
+      <HintPath>I:/Networking/000_assignment_1_starting_code/client/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro">
-      <HintPath>I:/Y2/Block 3/Networking/000_assignment_1_starting_code/client/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
+      <HintPath>I:/Networking/000_assignment_1_starting_code/client/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.UI">
-      <HintPath>I:/Y2/Block 3/Networking/000_assignment_1_starting_code/client/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
+      <HintPath>I:/Networking/000_assignment_1_starting_code/client/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AIModule">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.19f1/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>

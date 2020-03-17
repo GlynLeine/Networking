@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net.Sockets;
 
-namespace server
+namespace shared
 {
 	/**
 	 * StreamUtil class should be used whenever you want to send/receive bytes over a TcpClient connection.
