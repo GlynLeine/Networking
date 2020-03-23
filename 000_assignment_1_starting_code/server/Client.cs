@@ -8,7 +8,7 @@ using shared;
 
 namespace server
 {
-    class Client
+    public class Client
     {
         public TcpClient tcp;
         public string name;
@@ -31,7 +31,14 @@ namespace server
 
         public void Write(byte[] data)
         {
-            StreamUtil.Write(GetStream(), data);
+            try
+            {
+                StreamUtil.Write(GetStream(), data);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
 
         public string ReadString()
