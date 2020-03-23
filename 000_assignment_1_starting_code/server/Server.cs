@@ -16,17 +16,35 @@ namespace server
         List<string> todestroy = new List<string>();
 
         Mutex clientListMutex = new Mutex();
-        Dictionary<string, Room> rooms = new Dictionary<string, Room>();
-        Dictionary<string, Client> clients = new Dictionary<string, Client>();
+        public Dictionary<string, Room> rooms = new Dictionary<string, Room>();
+        public Dictionary<string, Client> clients = new Dictionary<string, Client>();
 
         Dictionary<string, string> credentials = new Dictionary<string, string>();
 
         bool exit;
         Stopwatch stopwatch;
 
+        public Dictionary<string, Command> commands = new Dictionary<string, Command>();
+
         public Server()
         {
             rooms.Add("global", new Room("global"));
+            RegisterCommand<Reconfirm>();
+            RegisterCommand<Whisper>();
+            RegisterCommand<List>();
+            RegisterCommand<ListRooms>();
+            RegisterCommand<JoinRoom>();
+            RegisterCommand<ListAll>();
+            RegisterCommand<CreateRoom>();
+            RegisterCommand<NickName>();
+            RegisterCommand<Help>();
+            RegisterCommand<Disconnect>();
+        }
+
+        void RegisterCommand<CommandType>() where CommandType : Command
+        {
+            CommandType command = (CommandType)Activator.CreateInstance(typeof(CommandType), new object[] { this });
+            commands.Add(command.GetName(), command);
         }
 
         public void Run()
@@ -265,105 +283,30 @@ namespace server
                     parameters = new string[] { parameter };
             }
 
-            if (command == "nickname" || command == "nick")
+            foreach (Command commandObj in commands.Values)
             {
-                if (parameters == null)
+                if (commandObj.Identify(command))
                 {
-                    client.WriteString("0 parameters found, 1 expected");
-                    return 0;
-                }
-
-                string nick = parameters[0];
-                nick = nick.ToLower();
-
-                ChangeNickName(client, nick);
-
-                return -1;
-            }
-            else if (command == "ls" || command == "list")
-            {
-                if (client.room == null)
-                    client.WriteString("You're currently not in a room.");
-                else
-                {
-                    string list = "Users in room " + client.room.name + ":";
-
-                    foreach (string name in client.room.clients.Keys)
-                        list += "\n\t" + name;
-
-                    client.WriteString(list);
+                    return commandObj.Execute(client, parameter, parameters);
                 }
             }
-            else if (command == "lsa" || command == "listall")
-            {
-                string list = "All users:";
 
-                foreach (string name in clients.Keys)
-                    list += "\n\t" + name;
-
-                client.WriteString(list);
-            }
-            else if (command == "listrm" || command == "listrooms" || command == "lsrm")
-            {
-                string list = "Rooms:";
-
-                foreach (string roomName in rooms.Keys)
-                    list += "\n\t" + roomName;
-
-                client.WriteString(list);
-            }
-            else if (command == "createroom" || command == "crm")
-            {
-                if (parameters == null)
-                {
-                    client.WriteString("0 parameters found, 1 or 2 expected");
-                    return 0;
-                }
-                string roomName = parameters[0];
-
-                if (rooms.ContainsKey(roomName))
-                {
-                    client.WriteString("Room " + roomName + " already exists.");
-                    return 0;
-                }
-
-                string password = "";
-                if (parameters.Length > 1)
-                    password = parameters[1];
-
-                Room room = new Room(client, roomName, password);
-                rooms.Add(roomName, room);
-
-                MoveClientToRoom(client, room, password);
-            }
-            else if (command == "join" || command == "joinroom")
-            {
-                if (parameters != null)
-                {
-                    if (!rooms.ContainsKey(parameters[0]))
-                    {
-                        client.WriteString("Room " + parameters[0] + " does not exist.");
-                        return 0;
-                    }
-
-                    if (parameters.Length > 1)
-                        MoveClientToRoom(client, rooms[parameters[0]], parameters[1]);
-                    else
-                        MoveClientToRoom(client, rooms[parameters[0]], "");
-                }
-                else
-                    client.WriteString("0 parameters found, 1 or 2 expected");
-            }
-            else if (command == "reconfirm")
-            {
-                client.timeout = 0f;
-                Console.WriteLine(client.name + " is still connected");
-            }
-            else
-            {
-                Console.WriteLine("Unknown command: " + command + " " + parameter);
-            }
+            Console.WriteLine("Unknown command: " + command + " " + parameter);
             return 0;
+        }
+
+        public string[] GetClientList()
+        {
+            string[] clientNames = new string[clients.Keys.Count];
+            clients.Keys.CopyTo(clientNames, 0);
+            return clientNames;
+        }
+
+        public string[] GetRoomList()
+        {
+            string[] roomNames = new string[rooms.Keys.Count];
+            rooms.Keys.CopyTo(roomNames, 0);
+            return roomNames;
         }
 
         public void ChangeNickName(Client client, string name)

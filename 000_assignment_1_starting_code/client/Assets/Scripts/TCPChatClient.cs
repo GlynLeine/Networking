@@ -32,7 +32,7 @@ public class TCPChatClient : MonoBehaviour
     {
         while (connected)
         {
-            while(!accepted)
+            while (!accepted)
             {
                 yield return new WaitForSeconds(1f);
             }
@@ -130,13 +130,14 @@ public class TCPChatClient : MonoBehaviour
                     _panelWrapper.ClearOutput();
                     return;
                 }
-                else if(command == "disconnect")
+                else if (command == "disconnect")
                 {
                     connected = false;
                     accepted = false;
                     _client.Close();
                     _panelWrapper.ClearOutput();
                     _panelWrapper.AddOutput("Disconnected from server");
+                    return;
                 }
             }
 
@@ -168,11 +169,13 @@ public class TCPChatClient : MonoBehaviour
                     parameter = pInput.Substring(paramToken + 1);
                     if (parameter.Contains(" "))
                         parameters = parameter.Split(' ');
+                    else
+                        parameters = new string[] { parameter };
                 }
 
                 if (command == "login")
                 {
-                    if(connected)
+                    if (connected)
                     {
                         _panelWrapper.AddOutput("You're already logged in.");
                         return;
@@ -195,9 +198,40 @@ public class TCPChatClient : MonoBehaviour
                     StartCoroutine(connectToServer());
                     return;
                 }
+                else if (command == "help" || command == "h")
+                {
+                    if (!connected)
+                    {
+                        string message = "";
+                        if (parameters == null)
+                        {
+                            message = "Commands:";
+
+                            message += "\n\thelp";
+                            message += "\n\tlogin";
+                        }
+                        else
+                        {
+                            if(parameters[0] == "login")
+                            {
+                                message = "\nThis command is used to log into the server or register a new account. the command expects 2 parameters. The first being your username and the second your password.";
+                            }
+                            else if(parameters[0] == "help" || parameters[0] == "h")
+                            {
+                                message = "\nYou just used this command... this command is used to get a list of all commands or get more information on a certain command.\nAliases: h";
+                            }
+                            else
+                            {
+                                message = "Command " + parameters[0] + " is unknown.";
+                            }
+                        }
+
+                        _panelWrapper.AddOutput(message);
+                    }
+                }
                 else if (command == "disconnect")
                 {
-                    if(!connected)
+                    if (!connected)
                     {
                         _panelWrapper.AddOutput("Can't disconnect without being connected");
                         return;
@@ -215,7 +249,6 @@ public class TCPChatClient : MonoBehaviour
         {
             try
             {
-                //echo client - send one, expect one (but that is not how a chat works ...)
                 byte[] outBytes = Encoding.UTF8.GetBytes(pInput);
                 StreamUtil.Write(_client.GetStream(), outBytes);
             }
