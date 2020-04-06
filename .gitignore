@@ -65,3 +65,12 @@ crashlytics-build.properties
 000_assignment_1_starting_code/server/obj/x86/Debug
 000_assignment_1_starting_code/server/packages/System.ValueTuple.4.5.0/lib
 000_assignment_1_starting_code/server/packages
+lecture_2_examples+
+000_assignment_2_starting_code/client/Packages
+000_assignment_2_starting_code/client/obj
+000_assignment_2_starting_code/client/Library
+000_assignment_2_starting_code/client/Export
+000_assignment_2_starting_code/server/bin
+000_assignment_2_starting_code/server/obj
+000_assignment_2_starting_code/shared/bin
+000_assignment_2_starting_code/shared/obj
