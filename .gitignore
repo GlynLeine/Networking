@@ -74,3 +74,10 @@ lecture_2_examples+
 000_assignment_2_starting_code/server/obj
 000_assignment_2_starting_code/shared/bin
 000_assignment_2_starting_code/shared/obj
+assignment_3/client/Library
+assignment_3/client/obj
+assignment_3/client/Temp
+assignment_3/server/bin
+assignment_3/server/obj
+assignment_3/shared/bin
+assignment_3/shared/obj
