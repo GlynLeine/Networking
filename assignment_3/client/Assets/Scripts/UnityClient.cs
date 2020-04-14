@@ -71,11 +71,17 @@ public class UnityClient : MonoBehaviour
     public UnityEvent onLogin;
     public UnityEvent onConnect;
 
+    public PopUpManager popUpManager;
+
     private CustomDataClient<ClientData> client;
 
     public void RegisterToServer(string username, string password, string passwordRepeat)
     {
-
+        if (password == passwordRepeat)
+            client.Write(new Registration(username, password));
+        else
+            popUpManager.ShowPopUp("passwords don't match");
+        Debug.Log("Attempting register with username: " + username + " and password: " + password);
     }
 
     public void LoginToServer(string username, string password)
@@ -123,7 +129,7 @@ public class UnityClient : MonoBehaviour
 
     private void OnClientDataUpdate(ClientData data)
     {
-        
+
     }
 
     public void OnUserListReceived(List<ClientData> clientData)
