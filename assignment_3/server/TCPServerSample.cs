@@ -15,6 +15,7 @@ class TCPServerSample
     public static void Main(string[] args)
     {
         Server server = new Server();
+        GameManager gameManager = new GameManager(server);
         server.Run();
     }
 }

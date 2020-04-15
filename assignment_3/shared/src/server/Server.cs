@@ -13,6 +13,12 @@ namespace shared
     {
         public uint id;
         public string username;
+
+        public ClientData(uint id = 0, string username = "")
+        {
+            this.id = id;
+            this.username = username;
+        }
     }
 
     public class Server
@@ -27,10 +33,17 @@ namespace shared
         List<Client> unregisteredClients = new List<Client>();
 
         bool exit;
+
+        public bool Exit => exit;
+
         public bool hidePing = true;
-        Stopwatch stopwatch;
 
         public bool relax = true;
+
+        public Action<CustomDataClient<ClientData>> onClientConnect;
+        public Action<CustomDataClient<ClientData>> onClientDisconnect;
+
+        public Action onThreadAwait;
 
         public Server()
         {
@@ -70,11 +83,12 @@ namespace shared
 
             connectionThread.Join();
             updateThread.Join();
+            onThreadAwait?.Invoke();
         }
 
         private void GetNewClients()
         {
-            stopwatch = new Stopwatch();
+            Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
             float previousFrame = 0;
 
@@ -152,42 +166,52 @@ namespace shared
 
                 ClientData data = client.data;
                 data.id = GetId(connection.Username);
+                data.username = connection.Username;
                 client.data = data;
 
                 if (clients.ContainsKey(client.data.id))
                 {
-                    DisconnectClient(client, "Account already logged in.");
+                    client.Write(new Login(0, "Account already logged in."));
+                    return PacketAction.resolved;
                 }
-                else
-                {
-                    client.Write(new Login(client.data.id));
-
-                    List<ClientData> clientData = new List<ClientData>();
-                    foreach (var otherClient in clients.Values)
-                        clientData.Add(otherClient);
-
-                    client.Write(new UserList(clientData));
-
-                    Console.WriteLine("Registered new connection with client: " + client.data.id);
-                    client.onPacketReceived += HandleClientPacket;
-                    client.onConnectionTimeout += HandleClientTimeout;
-                    client.onDisconnect += HandleExternalDisconnect;
-
-                    clientListMutex.WaitOne();
-                    clients.Add(client.data.id, client);
-                    clientListMutex.ReleaseMutex();
-                }
-
-                client.onPacketReceived -= HandleClientRegistration;
-                unregisteredClients.Remove(client);
-
-                return PacketAction.resolved;
             }
-            //else if(protocol is something)
-            //{
+            else if (protocol is Registration)
+            {
+                Registration registration = protocol as Registration;
+                if (credentials.ContainsKey(registration.Username))
+                {
+                    client.Write(new Login(0, "Username already taken."));
+                    return PacketAction.resolved;
+                }
 
-            //}
-            return PacketAction.irrelevant;
+                credentials.Add(registration.Username, registration.PassHash);
+                ClientData data = client.data;
+                data.id = GetId(registration.Username);
+                data.username = registration.Username;
+                client.data = data;
+            }
+            else
+            {
+                return PacketAction.irrelevant;
+            }
+
+            client.Write(new Login(client.data.id));
+
+            Console.WriteLine("Registered new connection with client: " + client.data.id);
+            client.onPacketReceived += HandleClientPacket;
+            client.onConnectionTimeout += HandleClientTimeout;
+            client.onDisconnect += HandleExternalDisconnect;
+
+            clientListMutex.WaitOne();
+            clients.Add(client.data.id, client);
+            clientListMutex.ReleaseMutex();
+
+            client.onPacketReceived -= HandleClientRegistration;
+            unregisteredClients.Remove(client);
+
+            onClientConnect?.Invoke(client);
+
+            return PacketAction.resolved;
         }
 
         private void HandleClientTimeout(Client client)
@@ -220,22 +244,9 @@ namespace shared
             }
         }
 
-        public void UpdateClientData(ClientData data)
-        {
-            if (!clients.ContainsKey(data.id))
-                return;
-
-            ClientData original = clients[data.id].data;
-            original.username = data.username;
-
-            clients[data.id].data = original;
-
-            Broadcast(new UpdateData(data), (object clientData)=>{ return data.id != ((ClientData)clientData).id; });
-        }
-
         private void UpdateClients()
         {
-            stopwatch = new Stopwatch();
+            Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
             float previousFrame = 0;
 
@@ -263,11 +274,14 @@ namespace shared
 
         public void DisconnectClient(Client client, string message = "")
         {
-            client.Write(new Disconnection(message));
+            onClientDisconnect?.Invoke(client as CustomDataClient<ClientData>);
+
+            if (client.connected)
+                client.Write(new Disconnection(message));
             Console.WriteLine("Disconnected client " + (client as CustomDataClient<ClientData>).data.id + " " + client.ip + " for reason:\n\t" + message);
             client.Close();
 
-            Broadcast(new Disconnection((client as CustomDataClient<ClientData>).data.id));
+            Broadcast(new Disconnection((client as CustomDataClient<ClientData>).data));
         }
     }
 }

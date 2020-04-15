@@ -18,6 +18,8 @@ namespace shared
             this.mode = mode;
         }
 
+        public ProtocolMode Mode => mode;
+
         /// <summary>
         /// Server-side execution.
         /// </summary>

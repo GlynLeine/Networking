@@ -28,6 +28,9 @@ namespace shared
         string username;
         string passwordHash;
 
+        public string Username => username;
+        public string PassHash => passwordHash;
+
         protected override void Read(Packet packet)
         {
             username = packet.ReadString();

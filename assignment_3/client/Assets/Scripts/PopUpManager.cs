@@ -8,11 +8,6 @@ public class PopUpManager : MonoBehaviour
     public TMP_Text popUpText;
     public Animator popUpAnimator;
 
-    private void Start()
-    {
-        ShowPopUp("sah");
-    }
-
     Queue<string> popupQueue = new Queue<string>();
 
     public void ShowPopUp(string text)

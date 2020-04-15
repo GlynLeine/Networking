@@ -8,33 +8,37 @@ namespace shared
 {
     public class Disconnection : Protocol
     {
-        public delegate void OnOtherDisconnect(uint id);
+        public delegate void OnOtherDisconnect(ClientData clientData);
         public static OnOtherDisconnect onOtherDisconnect;
 
         public Disconnection() : base(ProtocolMode.read) { }
         public Disconnection(string message) : base(ProtocolMode.write)
         {
             justification = message;
+            clientData.id = 0;
+            clientData.username = "";
         }
 
-        public Disconnection(uint id) : base(ProtocolMode.write)
+        public Disconnection(ClientData clientData) : base(ProtocolMode.write)
         {
-            this.id = id;
+            this.clientData = clientData;
         }
 
-        uint id = 0;
+        ClientData clientData;
         string justification = "";
 
-        protected override void Read(Packet pPacket)
+        protected override void Read(Packet packet)
         {
-            id = pPacket.ReadUint();
-            justification = pPacket.ReadString();
+            clientData.id = packet.ReadUint();
+            clientData.username = packet.ReadString();
+            justification = packet.ReadString();
         }
 
-        protected override void Write(Packet pPacket)
+        protected override void Write(Packet packet)
         {
-            pPacket.Write(id);
-            pPacket.Write(justification);
+            packet.Write(clientData.id);
+            packet.Write(clientData.username);
+            packet.Write(justification);
         }
 
         public override void Execute(Server server, Client client)
@@ -45,14 +49,14 @@ namespace shared
 
         public override void Execute(Client client)
         {
-            if (id == 0)
+            if (clientData.id == 0)
             {
                 client.Close();
                 client.onDisconnect?.Invoke(client, "Disconnected by server.");
             }
             else
             {
-                onOtherDisconnect?.Invoke(id);
+                onOtherDisconnect?.Invoke(clientData);
             }
         }
     }

@@ -75,10 +75,24 @@ public class UnityClient : MonoBehaviour
 
     private CustomDataClient<ClientData> client;
 
+    public uint Id => client.data.id;
+    public string UserName => client.data.username;
+
+    public void Write(Protocol protocol)
+    {
+        if (protocol.Mode != ProtocolMode.read)
+            client.Write(protocol);
+    }
+
     public void RegisterToServer(string username, string password, string passwordRepeat)
     {
         if (password == passwordRepeat)
+        {
             client.Write(new Registration(username, password));
+            ClientData data = client.data;
+            data.username = username;
+            client.data = data;
+        }
         else
             popUpManager.ShowPopUp("passwords don't match");
         Debug.Log("Attempting register with username: " + username + " and password: " + password);
@@ -87,6 +101,9 @@ public class UnityClient : MonoBehaviour
     public void LoginToServer(string username, string password)
     {
         client.Write(new Connection(username, password));
+        ClientData data = client.data;
+        data.username = username;
+        client.data = data;
         Debug.Log("Attempting login with username: " + username + " and password: " + password);
     }
 
@@ -99,21 +116,17 @@ public class UnityClient : MonoBehaviour
             client.data = data;
             Debug.Log("Login accepted with id: " + acceptedId);
             onLogin?.Invoke();
-            client.Write(new UpdateData(client.data));
         }
         else
-            Debug.Log(message);
-    }
-
-    private void OnOtherDisconnect(uint id)
-    {
-
+            popUpManager.ShowPopUp(message);
     }
 
     private void OnServerDisconnect(Client client, string message)
     {
         Debug.Log("Disconnected for reason: " + message);
         onDisconnect?.Invoke();
+        popUpManager.ShowPopUp("Server disconnected");
+
         connectToServer();
     }
 
@@ -121,20 +134,7 @@ public class UnityClient : MonoBehaviour
     {
         Console.SetOut(new DebugLogWriter());
         Login.onLogin += OnServerLogin;
-        UserList.onUserListReceived += OnUserListReceived;
-        UpdateData.onClientDataUpdate += OnClientDataUpdate;
-        Disconnection.onOtherDisconnect += OnOtherDisconnect;
         connectToServer();
-    }
-
-    private void OnClientDataUpdate(ClientData data)
-    {
-
-    }
-
-    public void OnUserListReceived(List<ClientData> clientData)
-    {
-
     }
 
     private void connectToServer()
@@ -155,8 +155,6 @@ public class UnityClient : MonoBehaviour
         StartCoroutine(TryConnect());
     }
 
-    // RECEIVING CODE
-
     private void Update()
     {
         client.UpdateAll(Time.deltaTime);
@@ -169,6 +167,7 @@ public class UnityClient : MonoBehaviour
             return PacketAction.irrelevant;
 
         protocol.Execute(client);
+
         return PacketAction.resolved;
     }
 
